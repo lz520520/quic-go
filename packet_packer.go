@@ -359,7 +359,7 @@ func (p *packetPacker) initialPaddingLen(frames []*ackhandler.Frame, size protoc
 func (p *packetPacker) PackCoalescedPacket(onlyAck bool, v protocol.VersionNumber) (*coalescedPacket, error) {
 	maxPacketSize := p.maxPacketSize
 	if p.perspective == protocol.PerspectiveClient {
-		maxPacketSize = protocol.MinInitialPacketSize
+		maxPacketSize = protocol.ByteCount(protocol.MinInitialPacketSize)
 	}
 	var (
 		initialHdr, handshakeHdr, zeroRTTHdr                            *wire.ExtendedHeader

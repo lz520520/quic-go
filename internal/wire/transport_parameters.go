@@ -288,8 +288,8 @@ func (p *TransportParameters) readNumericTransportParameter(
 	case maxIdleTimeoutParameterID:
 		p.MaxIdleTimeout = utils.Max(protocol.MinRemoteIdleTimeout, time.Duration(val)*time.Millisecond)
 	case maxUDPPayloadSizeParameterID:
-		if val < 1200 {
-			return fmt.Errorf("invalid value for max_packet_size: %d (minimum 1200)", val)
+		if val < uint64(protocol.MinInitialPacketSize) {
+			return fmt.Errorf("invalid value for max_packet_size: %d (minimum %d)", val, protocol.MinInitialPacketSize)
 		}
 		p.MaxUDPPayloadSize = protocol.ByteCount(val)
 	case ackDelayExponentParameterID:
