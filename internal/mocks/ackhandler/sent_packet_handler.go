@@ -8,10 +8,10 @@ import (
 	reflect "reflect"
 	time "time"
 
-	gomock "github.com/golang/mock/gomock"
 	ackhandler "github.com/quic-go/quic-go/internal/ackhandler"
 	protocol "github.com/quic-go/quic-go/internal/protocol"
 	wire "github.com/quic-go/quic-go/internal/wire"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockSentPacketHandler is a mock of SentPacketHandler interface.
@@ -61,20 +61,6 @@ func (m *MockSentPacketHandler) GetLossDetectionTimeout() time.Time {
 func (mr *MockSentPacketHandlerMockRecorder) GetLossDetectionTimeout() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLossDetectionTimeout", reflect.TypeOf((*MockSentPacketHandler)(nil).GetLossDetectionTimeout))
-}
-
-// HasPacingBudget mocks base method.
-func (m *MockSentPacketHandler) HasPacingBudget() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HasPacingBudget")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// HasPacingBudget indicates an expected call of HasPacingBudget.
-func (mr *MockSentPacketHandlerMockRecorder) HasPacingBudget() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasPacingBudget", reflect.TypeOf((*MockSentPacketHandler)(nil).HasPacingBudget))
 }
 
 // OnLossDetectionTimeout mocks base method.
@@ -162,43 +148,43 @@ func (mr *MockSentPacketHandlerMockRecorder) ReceivedBytes(arg0 interface{}) *go
 }
 
 // ResetForRetry mocks base method.
-func (m *MockSentPacketHandler) ResetForRetry() error {
+func (m *MockSentPacketHandler) ResetForRetry(arg0 time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ResetForRetry")
+	ret := m.ctrl.Call(m, "ResetForRetry", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // ResetForRetry indicates an expected call of ResetForRetry.
-func (mr *MockSentPacketHandlerMockRecorder) ResetForRetry() *gomock.Call {
+func (mr *MockSentPacketHandlerMockRecorder) ResetForRetry(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetForRetry", reflect.TypeOf((*MockSentPacketHandler)(nil).ResetForRetry))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetForRetry", reflect.TypeOf((*MockSentPacketHandler)(nil).ResetForRetry), arg0)
 }
 
 // SendMode mocks base method.
-func (m *MockSentPacketHandler) SendMode() ackhandler.SendMode {
+func (m *MockSentPacketHandler) SendMode(arg0 time.Time) ackhandler.SendMode {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMode")
+	ret := m.ctrl.Call(m, "SendMode", arg0)
 	ret0, _ := ret[0].(ackhandler.SendMode)
 	return ret0
 }
 
 // SendMode indicates an expected call of SendMode.
-func (mr *MockSentPacketHandlerMockRecorder) SendMode() *gomock.Call {
+func (mr *MockSentPacketHandlerMockRecorder) SendMode(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMode", reflect.TypeOf((*MockSentPacketHandler)(nil).SendMode))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMode", reflect.TypeOf((*MockSentPacketHandler)(nil).SendMode), arg0)
 }
 
 // SentPacket mocks base method.
-func (m *MockSentPacketHandler) SentPacket(arg0 *ackhandler.Packet) {
+func (m *MockSentPacketHandler) SentPacket(arg0 time.Time, arg1, arg2 protocol.PacketNumber, arg3 []ackhandler.StreamFrame, arg4 []ackhandler.Frame, arg5 protocol.EncryptionLevel, arg6 protocol.ByteCount, arg7 bool) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SentPacket", arg0)
+	m.ctrl.Call(m, "SentPacket", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 }
 
 // SentPacket indicates an expected call of SentPacket.
-func (mr *MockSentPacketHandlerMockRecorder) SentPacket(arg0 interface{}) *gomock.Call {
+func (mr *MockSentPacketHandlerMockRecorder) SentPacket(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SentPacket", reflect.TypeOf((*MockSentPacketHandler)(nil).SentPacket), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SentPacket", reflect.TypeOf((*MockSentPacketHandler)(nil).SentPacket), arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 }
 
 // SetHandshakeConfirmed mocks base method.

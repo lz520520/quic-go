@@ -1,15 +1,21 @@
 package quic
 
 type sender interface {
-	Send(p *packetBuffer)
+	// Send sends a packet. GSO is only used if gsoSize > 0.
+	Send(p *packetBuffer, gsoSize uint16)
 	Run() error
 	WouldBlock() bool
 	Available() <-chan struct{}
 	Close()
 }
 
+type queueEntry struct {
+	buf     *packetBuffer
+	gsoSize uint16
+}
+
 type sendQueue struct {
-	queue       chan *packetBuffer
+	queue       chan queueEntry
 	closeCalled chan struct{} // runStopped when Close() is called
 	runStopped  chan struct{} // runStopped when the run loop returns
 	available   chan struct{}
@@ -26,16 +32,16 @@ func newSendQueue(conn sendConn) sender {
 		runStopped:  make(chan struct{}),
 		closeCalled: make(chan struct{}),
 		available:   make(chan struct{}, 1),
-		queue:       make(chan *packetBuffer, sendQueueCapacity),
+		queue:       make(chan queueEntry, sendQueueCapacity),
 	}
 }
 
 // Send sends out a packet. It's guaranteed to not block.
 // Callers need to make sure that there's actually space in the send queue by calling WouldBlock.
 // Otherwise Send will panic.
-func (h *sendQueue) Send(p *packetBuffer) {
+func (h *sendQueue) Send(p *packetBuffer, gsoSize uint16) {
 	select {
-	case h.queue <- p:
+	case h.queue <- queueEntry{buf: p, gsoSize: gsoSize}:
 		// clear available channel if we've reached capacity
 		if len(h.queue) == sendQueueCapacity {
 			select {
@@ -69,17 +75,17 @@ func (h *sendQueue) Run() error {
 			h.closeCalled = nil // prevent this case from being selected again
 			// make sure that all queued packets are actually sent out
 			shouldClose = true
-		case p := <-h.queue:
-			if err := h.conn.Write(p.Data); err != nil {
+		case e := <-h.queue:
+			if err := h.conn.Write(e.buf.Data, e.gsoSize); err != nil {
 				// This additional check enables:
 				// 1. Checking for "datagram too large" message from the kernel, as such,
 				// 2. Path MTU discovery,and
 				// 3. Eventual detection of loss PingFrame.
-				if !isMsgSizeErr(err) {
+				if !isSendMsgSizeErr(err) {
 					return err
 				}
 			}
-			p.Release()
+			e.buf.Release()
 			select {
 			case h.available <- struct{}{}:
 			default:
