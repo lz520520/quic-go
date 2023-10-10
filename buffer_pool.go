@@ -55,7 +55,7 @@ func (b *packetBuffer) Len() protocol.ByteCount { return protocol.ByteCount(len(
 func (b *packetBuffer) Cap() protocol.ByteCount { return protocol.ByteCount(cap(b.Data)) }
 
 func (b *packetBuffer) putBack() {
-	if cap(b.Data) == protocol.MaxPacketBufferSize {
+	if protocol.ByteCount(cap(b.Data)) == protocol.MaxPacketBufferSize {
 		bufferPool.Put(b)
 		return
 	}
