@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
-	"errors"
 	"hash"
 	"io"
 	"net"
@@ -21,6 +20,8 @@ type connCapabilities struct {
 	DF bool
 	// GSO (Generic Segmentation Offload) supported
 	GSO bool
+	// ECN (Explicit Congestion Notifications) supported
+	ECN bool
 }
 
 // rawConn is a connection that allow reading of a receivedPackeh.
@@ -29,7 +30,7 @@ type rawConn interface {
 	// WritePacket writes a packet on the wire.
 	// gsoSize is the size of a single packet, or 0 to disable GSO.
 	// It is invalid to set gsoSize if capabilities.GSO is not set.
-	WritePacket(b []byte, addr net.Addr, packetInfoOOB []byte, gsoSize uint16) (int, error)
+	WritePacket(b []byte, addr net.Addr, packetInfoOOB []byte, gsoSize uint16, ecn protocol.ECN) (int, error)
 	LocalAddr() net.Addr
 	SetReadDeadline(time.Time) error
 	io.Closer
@@ -42,13 +43,6 @@ type closePacket struct {
 	addr    net.Addr
 	info    packetInfo
 }
-
-type unknownPacketHandler interface {
-	handlePacket(receivedPacket)
-	setCloseError(error)
-}
-
-var errListenerAlreadySet = errors.New("listener already set")
 
 type packetHandlerMap struct {
 	mutex       sync.Mutex
